@@ -8,7 +8,7 @@ import pathlib
 import re
 from seleniumwire import webdriver
 import time
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 ***REMOVED***
@@ -35,7 +35,7 @@ def load_cookie() -> str:
 def construct_headers() -> Dict[str, str]:
     cookie = load_cookie()
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 '\
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 '
                       '(KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
         'cookie': cookie,
         'viewType': 'list'
@@ -63,6 +63,21 @@ def parse_item_byline(item: Any) -> str:
     :return: string
     """
     return item.find_all('span', class_="a-size-base", id=re.compile('^item-byline-(.*)'))[0].contents[0]
+
+
+def parse_item_price(item: Any) -> str:
+    """
+    Extract price by components of currency symbol, whole value (e.g., dollar), and fraction value (e.g. cents).
+    :param item:
+    :return:
+    """
+    try:
+        price_symbol = item.find_all('span', class_="a-price-symbol")[0].contents[0]
+        price_whole = item.find_all('span', class_="a-price-whole")[0].contents[0]
+        price_fraction = item.find_all('span', class_="a-price-fraction")[0].contents[0]
+        return price_symbol + price_whole + '.' + price_fraction
+    except IndexError:
+        return r'N/A'
 
 
 def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
@@ -101,11 +116,17 @@ def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chro
     return items
 
 
-def save_list(items: Any) -> None:
+def build_items_list(items: Any) -> List[Dict[str, str]]:
     names = [parse_item_name(i) for i in items]
     by_lines = [parse_item_byline(i) for i in items]
-    combos = zip(names, by_lines)
-    save_dict = [{'name': i[0], 'by_line': i[1]} for i in combos]
+    prices = [parse_item_price(i) for i in items]
+    combos = zip(names, by_lines, prices)
+    list_dict = [{'name': i[0], 'by_line': i[1], 'price': i[2]} for i in combos]
+    return list_dict
+
+
+def save_list(items: Any) -> None:
+    save_dict = build_items_list(items)
     list_dir_path = pathlib.Path.home().joinpath('bookshelf', 'lists')
     if not list_dir_path.exists():
         list_dir_path.mkdir()
@@ -116,6 +137,6 @@ def save_list(items: Any) -> None:
 
 if __name__ == '__main__':
     # test list retrieval
-    items = get_amazon_list(url)
-    print([parse_item_name(i) for i in items])
-    save_list(items)
+    items_test = get_amazon_list(url)
+    print([parse_item_name(i) for i in items_test])
+    save_list(items_test)
