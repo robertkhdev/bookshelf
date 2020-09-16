@@ -65,11 +65,11 @@ def parse_item_byline(item: Any) -> str:
     return item.find_all('span', class_="a-size-base", id=re.compile('^item-byline-(.*)'))[0].contents[0]
 
 
-def parse_item_price(item: Any) -> str:
+def parse_item_amazon_price(item: Any) -> str:
     """
     Extract price by components of currency symbol, whole value (e.g., dollar), and fraction value (e.g. cents).
-    :param item:
-    :return:
+    :param item: bs4.element.Tag
+    :return: string
     """
     try:
         price_symbol = item.find_all('span', class_="a-price-symbol")[0].contents[0]
@@ -78,6 +78,49 @@ def parse_item_price(item: Any) -> str:
         return price_symbol + price_whole + '.' + price_fraction
     except IndexError:
         return r'N/A'
+
+
+def parse_item_used_new_price(item: Any) -> str:
+    """
+    Extract the "Used & New" price of an item.
+    :param item: bs4.element.Tag
+    :return: string
+    """
+    price_used_new = r'N/A'
+    try:
+        price_used_new = item.find_all('span', class_="a-color-price itemUsedAndNewPrice")[0].contents[0]
+    except:
+        pass
+    return price_used_new
+
+
+def parse_rating(item: Any) -> str:
+    """
+    Extract the average star rating of the item.
+    :param item: bs4.element.Tag
+    :return: string
+    """
+    rating = 'N/A'
+    try:
+        stars_str = item.find_all('span', class_="a-icon-alt")[0].contents[0]
+        rating = (float(stars_str.split()[0]), float(stars_str.split()[3]))
+    except:
+        pass
+    return rating
+
+
+def parse_num_reviews(item: Any) -> str:
+    """
+    Extract number of reviews for the tiem.
+    :param item: bs4.element.Tag
+    :return: string
+    """
+    num_reviews_str = '0'
+    try:
+        num_reviews_str = item.find_all('a', class_="a-size-base a-link-normal")[0].contents[0].strip()
+    except:
+        pass
+    return num_reviews_str
 
 
 def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
@@ -119,9 +162,17 @@ def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chro
 def build_items_list(items: Any) -> List[Dict[str, str]]:
     names = [parse_item_name(i) for i in items]
     by_lines = [parse_item_byline(i) for i in items]
-    prices = [parse_item_price(i) for i in items]
-    combos = zip(names, by_lines, prices)
-    list_dict = [{'name': i[0], 'by_line': i[1], 'price': i[2]} for i in combos]
+    prices_amazon = [parse_item_amazon_price(i) for i in items]
+    prices_used_new = [parse_item_used_new_price(i) for i in items]
+    ratings = [parse_rating(i) for i in items]
+    num_reviews = [parse_num_reviews(i) for i in items]
+    combos = zip(names, by_lines, prices_amazon, prices_used_new, ratings, num_reviews)
+    list_dict = [{'name': i[0],
+                  'by_line': i[1],
+                  'price_amazon': i[2],
+                  'price_used_new': i[3],
+                  'rating': i[4],
+                  'num_reviews': i[5]} for i in combos]
     return list_dict
 
 
