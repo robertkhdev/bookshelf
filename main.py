@@ -14,12 +14,12 @@ def load_list(file_name: str) -> List[Dict[str, str]]:
 def make_detail_line(item: Any) -> str:
     text = 'Price: ' + item['price_amazon'] + ' Used&New: ' + item['price_used_new'] + \
            'Avg. Rating: ' + str(item['rating'][0]) + '/' + str(item['rating'][1]) + \
-           ' Reviews: ' + item['num_reviews']
+           ' Reviews: ' + item['num_reviews'] + '\n'
     return text
 
 
 def make_item_row(item: Any) -> str:
-    row = [sg.Text(item['name'] + '\n' + item['by_line'] + '\n' + make_detail_line(item))]
+    row = [sg.Text(item['name'], font=['Arial', 12, 'bold']), sg.Text(item['by_line'] + '\n' + make_detail_line(item))]
     return row
 
 
@@ -37,7 +37,8 @@ def main_window():
     # rows = [[sg.Frame(layout=[[sg.Text(item['name'])], [sg.Text(item['by_line'])],
     #                           [sg.Text(make_detail_line(item))]], title='')] for item in items]
 
-    rows = [make_item_row(item) for item in items]
+    double_rows = [make_item_row(item) for item in items]
+    rows = [[item] for subrow in double_rows for item in subrow]
 
     layout = [[sg.Text('TEST')],
               [sg.Text('Input Text: ')], [sg.InputText()],
