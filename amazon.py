@@ -186,6 +186,14 @@ def save_list(items: Any) -> None:
         json.dump(save_dict, f)
 
 
+def add_list(url):
+    pass
+
+
+def load_list_urls():
+    pass
+
+
 if __name__ == '__main__':
     # test list retrieval
     items_test = get_amazon_list(url)

@@ -40,9 +40,9 @@ def main_window():
     double_rows = [make_item_row(item) for item in items]
     rows = [[item] for subrow in double_rows for item in subrow]
 
-    layout = [[sg.Text('TEST')],
+    layout = [[sg.Text('Text')],
               [sg.Text('Input Text: ')], [sg.InputText()],
-              [sg.Button("a button")]] + \
+              [sg.Button("Pull Lists"), sg.Button('Add List')]] + \
               rows + \
               [[sg.Text('')],
               [sg.Submit('Submit'), sg.Cancel('Cancel')]]
@@ -53,6 +53,8 @@ def main_window():
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Cancel':
             break
+        if event == 'Pull Lists':
+            pass
 
     window.close()
 
