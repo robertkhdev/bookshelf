@@ -186,12 +186,34 @@ def save_list(items: Any) -> None:
         json.dump(save_dict, f)
 
 
-def add_list(url):
-    pass
+def add_list(url: str) -> None:
+    """
+    Add list url to text file. This file has a default name in the bookshelf folder in the home directory.
+    It contains a list of Amazon list urls.
+    :param url:
+    :return:
+    """
+    # check if the list file exists
+    list_url_file = pathlib.Path.home().joinpath('bookshelf', 'list_urls.txt')
+    if not list_url_file.is_file():
+        with list_url_file.open(mode='w') as f:
+            f.write(url)
+    else:
+        # open file and load contents
+        with list_url_file.open(mode='r') as f:
+            list_urls = [line for line in f]
+        new_list_urls = list(set(list_urls + [url]))
+        with list_url_file.open(mode='w') as f:
+            f.write('\n'.join(new_list_urls))
 
 
-def load_list_urls():
-    pass
+def load_lists_from_file(file_name: str) -> None:
+    """
+    Load list of lsit URLs from text file.
+    :param file_name:
+    :return:
+    """
+
 
 
 if __name__ == '__main__':

@@ -55,6 +55,9 @@ def main_window():
             break
         if event == 'Pull Lists':
             pass
+        if event == 'Add List':
+            list_url = sg.popup_get_text('Add List', 'Paste URL for list from your browser')
+            amazon.add_list(list_url)
 
     window.close()
 
