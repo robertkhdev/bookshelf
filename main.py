@@ -40,12 +40,12 @@ def main_window():
     double_rows = [make_item_row(item) for item in items]
     rows = [[item] for subrow in double_rows for item in subrow]
 
-    layout = [[sg.Text('Text')],
+    layout_top = [[sg.Text('Text')],
               [sg.Text('Input Text: ')], [sg.InputText()],
-              [sg.Button("Pull Lists"), sg.Button('Add List')]] + \
-              rows + \
-              [[sg.Text('')],
+              [sg.Button("Pull Lists"), sg.Button('Add List')]]
+    layout_bottom = [[sg.Text('')],
               [sg.Submit('Submit'), sg.Cancel('Cancel')]]
+    layout = layout_top + rows + layout_bottom
 
     window = sg.Window('Main Window', resizable=True).Layout([[sg.Column(layout, size=(900, 600), scrollable=True)]])
 
@@ -54,7 +54,7 @@ def main_window():
         if event == sg.WIN_CLOSED or event == 'Cancel':
             break
         if event == 'Pull Lists':
-            pass
+            amazon.download_all_lists()
         if event == 'Add List':
             list_url = sg.popup_get_text('Add List', 'Paste URL for list from your browser')
             amazon.add_list(list_url)
