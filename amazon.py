@@ -123,6 +123,24 @@ def parse_num_reviews(item: Any) -> str:
     return num_reviews_str
 
 
+def parse_itemId(item: Any) -> str:
+    item_id = ''
+    try:
+        item_id = item.find_all('input', attrs={'name':"itemId"})[0]['value']
+    except:
+        pass
+    return item_id
+
+
+def parse_itemExternalId(item: Any) -> str:
+    item_external_id = ''
+    try:
+        item_external_id = item.find_all('input', attrs={'name':"itemExternalId"})[0]['value']
+    except:
+        pass
+    return item_external_id
+
+
 def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
     """
     Use Selenium webdriver for Chrome in headless mode to retrieve the page for an Amazon Wish List.
@@ -166,13 +184,17 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
     prices_used_new = [parse_item_used_new_price(i) for i in items]
     ratings = [parse_rating(i) for i in items]
     num_reviews = [parse_num_reviews(i) for i in items]
-    combos = zip(names, by_lines, prices_amazon, prices_used_new, ratings, num_reviews)
+    item_ids = [parse_itemId(i) for i in items]
+    item_external_ids = [parse_itemExternalId(i) for i in items]
+    combos = zip(names, by_lines, prices_amazon, prices_used_new, ratings, num_reviews, item_ids, item_external_ids)
     list_dict = [{'name': i[0],
                   'by_line': i[1],
                   'price_amazon': i[2],
                   'price_used_new': i[3],
                   'rating': i[4],
-                  'num_reviews': i[5]} for i in combos]
+                  'num_reviews': i[5],
+                  'item_id': i[6],
+                  'item_external_id': i[7]} for i in combos]
     return list_dict
 
 
