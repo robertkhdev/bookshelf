@@ -64,8 +64,17 @@ def download_all_lists():
             print(e)
 
 
+def load_list(file_name: str) -> List[Dict[str, str]]:
+    path = pathlib.Path.home().joinpath('bookshelf', 'lists', file_name)
+    if not path.exists():
+        return []
+    with path.open(mode='r') as f:
+        return json.loads(f.read())
+
+
 if __name__ == '__main__':
     # test list retrieval
+    ***REMOVED***
     items_test = amazon.get_amazon_list(url)
     print([amazon.parse_item_name(i) for i in items_test])
     save_list(items_test)

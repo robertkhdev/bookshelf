@@ -11,9 +11,6 @@ import time
 from typing import Any, Dict, List
 
 
-***REMOVED***
-
-
 class Error(Exception):
     """Base class for exceptions in this module"""
     pass
@@ -123,7 +120,7 @@ def parse_num_reviews(item: Any) -> str:
     return num_reviews_str
 
 
-def parse_itemId(item: Any) -> str:
+def parse_item_id(item: Any) -> str:
     item_id = ''
     try:
         item_id = item.find_all('input', attrs={'name':"itemId"})[0]['value']
@@ -132,7 +129,7 @@ def parse_itemId(item: Any) -> str:
     return item_id
 
 
-def parse_itemExternalId(item: Any) -> str:
+def parse_item_external_id(item: Any) -> str:
     item_external_id = ''
     try:
         item_external_id = item.find_all('input', attrs={'name':"itemExternalId"})[0]['value']
@@ -184,8 +181,8 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
     prices_used_new = [parse_item_used_new_price(i) for i in items]
     ratings = [parse_rating(i) for i in items]
     num_reviews = [parse_num_reviews(i) for i in items]
-    item_ids = [parse_itemId(i) for i in items]
-    item_external_ids = [parse_itemExternalId(i) for i in items]
+    item_ids = [parse_item_id(i) for i in items]
+    item_external_ids = [parse_item_external_id(i) for i in items]
     combos = zip(names, by_lines, prices_amazon, prices_used_new, ratings, num_reviews, item_ids, item_external_ids)
     list_dict = [{'name': i[0],
                   'by_line': i[1],
@@ -198,64 +195,5 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
     return list_dict
 
 
-def save_list(items: Any) -> None:
-    save_dict = build_items_list(items)
-    list_dir_path = pathlib.Path.home().joinpath('bookshelf', 'lists')
-    if not list_dir_path.exists():
-        list_dir_path.mkdir()
-    path = pathlib.Path.home().joinpath('bookshelf', 'lists', 'listdump.json')
-    with path.open(mode='w') as f:
-        json.dump(save_dict, f)
-
-
-def get_lists_from_file(file_name: str) -> List:
-    """
-    Load list of list URLs from text file.
-    :param file_name:
-    :return:
-    """
-    list_url_file = pathlib.Path.home().joinpath('bookshelf', file_name)
-    if not list_url_file.is_file():
-        return []
-    # open file and load contents
-    with list_url_file.open(mode='r') as f:
-        list_urls = [line for line in f]
-    return list_urls
-
-
-def add_list(url: str) -> None:
-    """
-    Add list url to text file. This file has a default name in the bookshelf folder in the home directory.
-    It contains a list of Amazon list urls.
-    :param url:
-    :return:
-    """
-    # check if the list file exists
-    list_url_file = pathlib.Path.home().joinpath('bookshelf', 'list_urls.txt')
-    if not list_url_file.is_file():
-        with list_url_file.open(mode='w') as f:
-            f.write(url)
-    else:
-        # open file and load contents
-        list_urls = get_lists_from_file('list_urls.txt')
-        new_list_urls = list(set(list_urls + [url]))
-        # write to file
-        with list_url_file.open(mode='w') as f:
-            f.write('\n'.join(new_list_urls))
-
-
-def download_all_lists():
-    # open file and load contents
-    list_urls = get_lists_from_file('list_urls.txt')
-    for url in list_urls:
-        try:
-            save_list(get_amazon_list(url))
-        except Exception as e:
-            print(e)
-
-
 if __name__ == '__main__':
-    # test list retrieval
-    items_test = get_amazon_list(url)
-    print([parse_item_name(i) for i in items_test])
-    save_list(items_test)
+    pass
