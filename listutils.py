@@ -8,8 +8,8 @@ import pathlib
 from typing import Any, Dict, List
 
 
-def save_list(items: Any, name: str=None) -> None:
-    print('Saving list')
+def save_list(items: Any, name: str = None) -> None:
+    print('Saving list: ', name)
     save_items = amazon.build_items_list(items)
     list_dir_path = pathlib.Path.home().joinpath('bookshelf', 'lists')
     if not list_dir_path.exists():
@@ -26,7 +26,7 @@ def save_list(items: Any, name: str=None) -> None:
 
 def get_lists_from_file(file_name: str) -> List:
     """
-    Load list of list URLs from text file.
+    Load list of list URLs from json file.
     :param file_name:
     :return:
     """
@@ -35,37 +35,39 @@ def get_lists_from_file(file_name: str) -> List:
         return []
     # open file and load contents
     with list_url_file.open(mode='r') as f:
-        list_urls = [line for line in f]
+        list_urls = json.load(f)
     return list_urls
 
 
-def add_list(url: str) -> None:
+def add_list_to_file(url: str, name: str) -> None:
     """
-    Add list url to text file. This file has a default name in the bookshelf folder in the home directory.
+    Add list url to json file. This file has a default name in the bookshelf folder in the home directory.
     It contains a list of Amazon list urls.
     :param url:
     :return:
     """
-    # check if the list file exists
-    list_url_file = pathlib.Path.home().joinpath('bookshelf', 'list_urls.txt')
-    if not list_url_file.is_file():
+    # check if the list file exists and create it if not
+    list_url_file = pathlib.Path.home().joinpath('bookshelf', 'list_urls.json')
+    url_to_save = [{'name': name, 'url': url}]
+    if not list_url_file.exists():
         with list_url_file.open(mode='w') as f:
-            f.write(url)
+            json.dump(url_to_save, f)
     else:
         # open file and load contents
-        list_urls = get_lists_from_file('list_urls.txt')
-        new_list_urls = list(set(list_urls + [url]))
+        list_urls = get_lists_from_file('list_urls.json')
+        new_list_urls = list_urls + url_to_save
         # write to file
         with list_url_file.open(mode='w') as f:
-            f.write('\n'.join(new_list_urls))
+            json.dump(new_list_urls, f)
 
 
 def download_all_lists():
     # open file and load contents
-    list_urls = get_lists_from_file('list_urls.txt')
+    list_urls = get_lists_from_file('list_urls.json')
     for url in list_urls:
+        print('Downloading list: ', url['name'])
         try:
-            save_list(amazon.get_amazon_list(url))
+            save_list(amazon.get_amazon_list(url['url']), url['name'])
         except Exception as e:
             print(e)
 

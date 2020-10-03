@@ -56,8 +56,17 @@ def main_window():
             window.Close()
             window = window1
         if event == 'Add List':
-            list_url = sg.popup_get_text('Add List', 'Paste URL for list from your browser')
-            listutils.add_list(list_url)
+            # list_url = sg.popup_get_text('Add List', 'Paste URL for list from your browser')
+            layout_popup = [
+                [sg.Text('Enter the url and a name for the Amazon List')],
+                [sg.Text('List URL', size=(15, 1)), sg.InputText()],
+                [sg.Text('List name', size=(15, 1)), sg.InputText()],
+                [sg.Submit(), sg.Cancel()]
+            ]
+            window_popup = sg.Window('Add List', layout_popup)
+            event, values = window_popup.read()
+            listutils.add_list_to_file(values[0], values[1])
+            window_popup.Close()
 
     window.close()
 
