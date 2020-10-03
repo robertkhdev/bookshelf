@@ -3,7 +3,7 @@ Contains functions for getting Amazon wish lists
 """
 
 from bs4 import BeautifulSoup
-import json
+import datetime as dt
 import pathlib
 import re
 from seleniumwire import webdriver
@@ -183,6 +183,7 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
     num_reviews = [parse_num_reviews(i) for i in items]
     item_ids = [parse_item_id(i) for i in items]
     item_external_ids = [parse_item_external_id(i) for i in items]
+    update_time = str(dt.datetime.now())
     combos = zip(names, by_lines, prices_amazon, prices_used_new, ratings, num_reviews, item_ids, item_external_ids)
     list_dict = [{'name': i[0],
                   'by_line': i[1],
@@ -191,7 +192,8 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
                   'rating': i[4],
                   'num_reviews': i[5],
                   'item_id': i[6],
-                  'item_external_id': i[7]} for i in combos]
+                  'item_external_id': i[7],
+                  'datetime': update_time} for i in combos]
     return list_dict
 
 

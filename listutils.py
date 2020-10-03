@@ -8,14 +8,20 @@ import pathlib
 from typing import Any, Dict, List
 
 
-def save_list(items: Any) -> None:
-    save_dict = amazon.build_items_list(items)
+def save_list(items: Any, name: str=None) -> None:
+    print('Saving list')
+    save_items = amazon.build_items_list(items)
     list_dir_path = pathlib.Path.home().joinpath('bookshelf', 'lists')
     if not list_dir_path.exists():
         list_dir_path.mkdir()
+
     path = pathlib.Path.home().joinpath('bookshelf', 'lists', 'listdump.json')
+    if path.exists():
+        with path.open(mode='r') as f:
+            existing_items = json.load(f)
+        save_items = existing_items + save_items
     with path.open(mode='w') as f:
-        json.dump(save_dict, f)
+        json.dump(save_items, f)
 
 
 def get_lists_from_file(file_name: str) -> List:
