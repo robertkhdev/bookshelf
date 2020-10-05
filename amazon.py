@@ -189,11 +189,11 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
                   'by_line': i[1],
                   'price_amazon': i[2],
                   'price_used_new': i[3],
-                  'rating': i[4],
+                  'rating': i[4][0],
                   'num_reviews': i[5],
                   'item_id': i[6],
                   'item_external_id': i[7],
-                  'datetime': update_time} for i in combos]
+                  'update_date': update_time} for i in combos]
     return list_dict
 
 
