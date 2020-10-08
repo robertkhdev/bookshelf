@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-import amazon
+import db
 import listutils
 from typing import Any, Dict, List
 
@@ -28,7 +28,7 @@ def main_window():
     :return:
     """
 
-    items = listutils.load_list('listdump.json')
+    items = db.get_current_items()
 
     rows = make_rows(items)
 
@@ -45,7 +45,7 @@ def main_window():
             break
         if event == 'Pull Lists':
             listutils.download_all_lists()
-            items = listutils.load_list('listdump.json')
+            items = db.get_current_items()
             rows = make_rows(items)
             layout_top = [[sg.Text('Text')],
                           [sg.Text('Input Text: ')], [sg.InputText()],

@@ -8,8 +8,9 @@ import listutils
 import pathlib
 import sqlite3
 from sqlite3 import Error
-from typing import Any
+from typing import Any, List
 
+db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
 def create_connection(db_file: str) -> Any:
     """
@@ -88,8 +89,28 @@ def load_data(data, conn):
         print(e)
 
 
+def get_current_items() -> List:
+    """
+    Gets the unique items with the latest update_date from the database.
+    :return:
+    """
+    sql_statment = """SELECT (name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
+                            item_external_id, update_date)
+                        FROM items it1
+                        WHERE
+                            it1.update_date = (SELECT max(update_date) from items it2 where it1.item_id = it2.item_id"""
+    rows = []
+    try:
+        conn = create_connection(db_path)
+        c = conn.cursor()
+        c.execute(sql_statment)
+        rows = c.fetchall()
+    except Error as e:
+        print(e)
+    return rows
+
+
 if __name__ == '__main__':
-    db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
     conn = create_connection(db_path)
     with conn:
         data = listutils.load_list('listdump.json')
