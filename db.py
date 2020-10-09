@@ -10,8 +10,8 @@ import sqlite3
 from sqlite3 import Error
 from typing import Any, Dict, List, Tuple
 
-DB_COLUMNS_LIST = """name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
-                            item_external_id, update_date"""
+DB_COLUMNS_LIST = ('name', 'by_line', 'price_amazon', 'price_used_new', 'rating', 'num_reviews', 'item_id',
+                   'item_external_id', 'update_date')
 
 db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
@@ -61,7 +61,7 @@ def create_items_table(conn):
                                             num_reviews int,
                                             item_id text,
                                             item_external_id text,
-                                            update_date, datetime
+                                            update_date datetime
                                         ); """
 
     if conn is not None:
@@ -98,7 +98,7 @@ def convert_db_row(row: Tuple) -> Dict:
     :param row: tuple of single result row from database
     :return: dict of item details, column names as keys
     """
-    return dict(zip(DB_COLUMNS_LIST.split(', '), row))
+    return dict(zip(DB_COLUMNS_LIST, row))
 
 
 def get_current_items() -> List:
@@ -106,7 +106,7 @@ def get_current_items() -> List:
     Gets the unique items with the latest update_date from the database.
     :return:
     """
-    sql_statment = """SELECT """ + DB_COLUMNS_LIST + """
+    sql_statment = """SELECT """ + ','.join(DB_COLUMNS_LIST) + """
                         FROM items it1
                         WHERE
                             it1.update_date = (SELECT max(update_date) FROM items it2 WHERE it1.item_id = it2.item_id)"""

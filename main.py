@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 def make_detail_line(item: Any) -> str:
     text = 'Price: ' + item['price_amazon'] + ' Used&New: ' + item['price_used_new'] + \
            'Avg. Rating: ' + str(item['rating']) + '/5' + \
-           ' Reviews: ' + str(item['num_reviews']) + '\n'
+           ' Reviews: ' + str(item['num_reviews']) + ' Updated: ' + item['update_date'] + '\n'
     return text
 
 
