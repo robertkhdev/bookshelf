@@ -8,7 +8,10 @@ import listutils
 import pathlib
 import sqlite3
 from sqlite3 import Error
-from typing import Any, List
+from typing import Any, Dict, List, Tuple
+
+DB_COLUMNS_LIST = """name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
+                            item_external_id, update_date"""
 
 db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
@@ -89,25 +92,34 @@ def load_data(data, conn):
         print(e)
 
 
+def convert_db_row(row: Tuple) -> Dict:
+    """
+    SELECT statement returns rows as tuples. Convert tuple to dict.
+    :param row: tuple of single result row from database
+    :return: dict of item details, column names as keys
+    """
+    return dict(zip(DB_COLUMNS_LIST.split(', '), row))
+
+
 def get_current_items() -> List:
     """
     Gets the unique items with the latest update_date from the database.
     :return:
     """
-    sql_statment = """SELECT (name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
-                            item_external_id, update_date)
+    sql_statment = """SELECT """ + DB_COLUMNS_LIST + """
                         FROM items it1
                         WHERE
-                            it1.update_date = (SELECT max(update_date) from items it2 where it1.item_id = it2.item_id"""
-    rows = []
+                            it1.update_date = (SELECT max(update_date) FROM items it2 WHERE it1.item_id = it2.item_id)"""
+    items = []
     try:
         conn = create_connection(db_path)
         c = conn.cursor()
         c.execute(sql_statment)
         rows = c.fetchall()
+        items = [convert_db_row(r) for r in rows]
     except Error as e:
         print(e)
-    return rows
+    return items
 
 
 if __name__ == '__main__':
