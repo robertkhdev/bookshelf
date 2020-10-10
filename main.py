@@ -34,7 +34,7 @@ def main_window():
 
     layout_top = [[sg.Text('Text')],
               [sg.Text('Input Text: ')], [sg.InputText()],
-              [sg.Button("Pull Lists"), sg.Button('Add List')]]
+              [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')]]
     layout = layout_top + rows
 
     window = sg.Window('Main Window', resizable=True).Layout([[sg.Column(layout, size=(900, 600), scrollable=True)]])
@@ -66,6 +66,12 @@ def main_window():
             window_popup = sg.Window('Add List', layout_popup)
             event, values = window_popup.read()
             listutils.add_list_to_file(values[0], values[1])
+            window_popup.Close()
+        if event == 'View Lists':
+            lists = listutils.get_lists_from_file('list_urls.json')
+            layout_popup = [[sg.Text(it['name']), sg.Text(it['url'])] for it in lists] + [[sg.Cancel()]]
+            window_popup = sg.Window('View Lists', layout_popup)
+            event, values = window_popup.read()
             window_popup.Close()
 
     window.close()

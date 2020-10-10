@@ -28,7 +28,7 @@ def get_lists_from_file(file_name: str) -> List:
     """
     Load list of list URLs from json file.
     :param file_name:
-    :return:
+    :return: list of dicts of names and urls
     """
     list_url_file = pathlib.Path.home().joinpath('bookshelf', file_name)
     if not list_url_file.is_file():
