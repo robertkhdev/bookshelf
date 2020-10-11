@@ -3,12 +3,13 @@ Contains functions for getting Amazon wish lists
 """
 
 import amazon
+import db
 import json
 import pathlib
 from typing import Any, Dict, List
 
 
-def save_list(items: Any, name: str = None) -> None:
+def save_list_to_file(items: Any, name: str = None) -> None:
     print('Saving list: ', name)
     save_items = amazon.build_items_list(items)
     list_dir_path = pathlib.Path.home().joinpath('bookshelf', 'lists')
@@ -22,6 +23,12 @@ def save_list(items: Any, name: str = None) -> None:
         save_items = existing_items + save_items
     with path.open(mode='w') as f:
         json.dump(save_items, f)
+
+
+def save_list(items: Any, name: str = None) -> None:
+    print('Saving list to database: ', name)
+    save_items = amazon.build_items_list(items)
+    db.load_data(save_items)
 
 
 def get_lists_from_file(file_name: str) -> List:

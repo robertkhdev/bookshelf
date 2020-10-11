@@ -15,6 +15,7 @@ DB_COLUMNS_LIST = ('name', 'by_line', 'price_amazon', 'price_used_new', 'rating'
 
 db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
+
 def create_connection(db_file: str) -> Any:
     """
     Create a database connection to the SQLite database specified by db_file.
@@ -70,7 +71,7 @@ def create_items_table(conn):
         print("Error! Cannot create database connection.")
 
 
-def load_data(data, conn):
+def load_data(data):
     """
     Load new data to items table.
     :param data: list of dictionaries containing item data
@@ -83,13 +84,15 @@ def load_data(data, conn):
                         VALUES
                             (:name, :by_line, :price_amazon, :price_used_new, :rating, :num_reviews, :item_id,
                             :item_external_id, :update_date)"""
-    create_items_table(conn)
-    try:
-        c = conn.cursor()
-        c.executemany(sql_statement, data)
-        conn.commit()
-    except Error as e:
-        print(e)
+    conn = create_connection(db_path)
+    with conn:
+        create_items_table(conn)
+        try:
+            c = conn.cursor()
+            c.executemany(sql_statement, data)
+            conn.commit()
+        except Error as e:
+            print(e)
 
 
 def convert_db_row(row: Tuple) -> Dict:

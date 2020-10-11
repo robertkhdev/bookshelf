@@ -5,20 +5,25 @@ from typing import Any, Dict, List
 
 
 def make_detail_line(item: Any) -> str:
-    text = 'Price: ' + item['price_amazon'] + ' Used&New: ' + item['price_used_new'] + \
-           'Avg. Rating: ' + str(item['rating']) + '/5' + \
-           ' Reviews: ' + str(item['num_reviews']) + ' Updated: ' + item['update_date'] + '\n'
+    text = 'Price: ' + item['price_amazon'] + '\tUsed&New: ' + item['price_used_new'] + \
+           '\tAvg. Rating: ' + str(item['rating']) + '/5' + \
+           '\tReviews: ' + str(item['num_reviews']) + '\tUpdated: ' + item['update_date'] + '\n'
     return text
 
 
 def make_rows(items: List) -> List:
-    double_rows = [make_item_row(item) for item in items]
+    double_rows = [make_item_row(item, i+1) for i, item in enumerate(items)]
     rows = [[item] for subrow in double_rows for item in subrow]
     return rows
 
 
-def make_item_row(item: Any) -> str:
-    row = [sg.Text(item['name'], font=['Arial', 12, 'bold']), sg.Text(item['by_line'] + '\n' + make_detail_line(item))]
+def make_item_row(item: Any, num: int = 0) -> str:
+    if num:
+        num_str = str(num)
+    else:
+        num_str = ''
+    row = [sg.Text(num_str + ' ' + item['name'], font=['Arial', 12, 'bold']), sg.Text(item['by_line'] +
+                                                                                      '\n' + make_detail_line(item))]
     return row
 
 
@@ -32,7 +37,7 @@ def main_window():
 
     rows = make_rows(items)
 
-    layout_top = [[sg.Text('Text')],
+    layout_top = [[sg.Text(str(len(items)) + ' Items')],
               [sg.Text('Input Text: ')], [sg.InputText()],
               [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')]]
     layout = layout_top + rows
