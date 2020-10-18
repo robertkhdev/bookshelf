@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import db
 import listutils
+import logging
 from typing import Any, Dict, List
 
 
@@ -32,14 +33,16 @@ def main_window():
 
     :return:
     """
+    sort_author_direction = True
+    logging.info('Starting GUI')
 
     items = db.get_current_items()
 
     rows = make_rows(items)
 
     layout_top = [[sg.Text(str(len(items)) + ' Items')],
-              [sg.Text('Input Text: ')], [sg.InputText()],
-              [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')]]
+              [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')],
+                  [sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
     layout = layout_top + rows
 
     window = sg.Window('Main Window', resizable=True).Layout([[sg.Column(layout, size=(900, 600), scrollable=True)]])
@@ -54,7 +57,7 @@ def main_window():
             rows = make_rows(items)
             layout_top = [[sg.Text('Text')],
                           [sg.Text('Input Text: ')], [sg.InputText()],
-                          [sg.Button("Pull Lists"), sg.Button('Add List')]]
+                          [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')]]
             layout = layout_top + rows
             window1 = sg.Window('Main Window', resizable=True).Layout(
                 [[sg.Column(layout, size=(900, 600), scrollable=True)]])
@@ -78,6 +81,19 @@ def main_window():
             window_popup = sg.Window('View Lists', layout_popup)
             event, values = window_popup.read()
             window_popup.Close()
+        if event == 'Sort Author':
+            items = sorted(items, key=lambda x: x['by_line'], reverse=sort_author_direction)
+            sort_author_direction = not sort_author_direction
+            rows = make_rows(items)
+            layout_top = [[sg.Text('Text')],
+                          [sg.Text('Input Text: ')], [sg.InputText()],
+                          [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')],
+                  [sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
+            layout = layout_top + rows
+            window1 = sg.Window('Main Window', resizable=True).Layout(
+                [[sg.Column(layout, size=(900, 600), scrollable=True)]])
+            window.Close()
+            window = window1
 
     window.close()
 
