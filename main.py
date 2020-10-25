@@ -18,7 +18,7 @@ def make_rows(items: List) -> List:
     return rows
 
 
-def make_item_row(item: Any, num: int = 0) -> str:
+def make_item_row(item: Any, num: int = 0) -> List:
     if num:
         num_str = str(num)
     else:
@@ -28,7 +28,7 @@ def make_item_row(item: Any, num: int = 0) -> str:
     return row
 
 
-def wrap_text(text, n=60):
+def wrap_text(text: str, n=60) -> str:
     return '\n'.join(list(text[i: i+n] for i in range(0, len(text), n)))
 
 
