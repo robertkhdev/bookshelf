@@ -106,11 +106,8 @@ def main_window():
         if event == 'Sort Author':
             items = sorted(items, key=lambda x: x['by_line'], reverse=sort_author_direction)
             sort_author_direction = not sort_author_direction
-            layout = make_main_layout(items)
-            window1 = sg.Window('Main Window', resizable=True).Layout(
-                [[sg.Column(layout, size=(900, 600), scrollable=True)]])
-            window.Close()
-            window = window1
+            headers, row_data = make_headers_and_rows(items)
+            window['-TABLE-'].update(row_data)
 
     window.close()
 
