@@ -66,6 +66,8 @@ def main_window():
     :return:
     """
     sort_author_direction = True
+    sort_amazon_price_direction = True
+    sort_rating_direction = True
     logging.info('Starting GUI')
 
     items = db.get_current_items()
@@ -80,11 +82,8 @@ def main_window():
         if event == 'Pull Lists':
             listutils.download_all_lists()
             items = db.get_current_items()
-            layout = make_main_layout(items)
-            window1 = sg.Window('Main Window', resizable=True).Layout(
-                [[sg.Column(layout, size=(900, 600), scrollable=True)]])
-            window.Close()
-            window = window1
+            headers, row_data = make_headers_and_rows(items)
+            window['-TABLE-'].update(row_data)
         if event == 'Add List':
             # list_url = sg.popup_get_text('Add List', 'Paste URL for list from your browser')
             layout_popup = [
@@ -106,6 +105,16 @@ def main_window():
         if event == 'Sort Author':
             items = sorted(items, key=lambda x: x['by_line'], reverse=sort_author_direction)
             sort_author_direction = not sort_author_direction
+            headers, row_data = make_headers_and_rows(items)
+            window['-TABLE-'].update(row_data)
+        if event == 'Sort Amazon Price':
+            items = sorted(items, key=lambda x: x['price_amazon'], reverse=sort_amazon_price_direction)
+            sort_amazon_price_direction = not sort_amazon_price_direction
+            headers, row_data = make_headers_and_rows(items)
+            window['-TABLE-'].update(row_data)
+        if event == 'Sort Rating':
+            items = sorted(items, key=lambda x: str(x['rating']), reverse=sort_rating_direction)
+            sort_rating_direction = not sort_rating_direction
             headers, row_data = make_headers_and_rows(items)
             window['-TABLE-'].update(row_data)
 
