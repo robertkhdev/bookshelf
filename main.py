@@ -32,6 +32,34 @@ def wrap_text(text: str, n=60) -> str:
     return '\n'.join(list(text[i: i+n] for i in range(0, len(text), n)))
 
 
+def make_headers_and_rows(items: List) -> (List, List):
+    headers = ['Title', 'Author', 'Price', 'New & Used', 'Rating', 'Reviews', 'Updated']
+    row_data = [[wrap_text(it['name']), it['by_line'], it['price_amazon'], it['price_used_new'], str(it['rating']),
+                 str(it['num_reviews']), it['update_date']] for it in items]
+    return headers, row_data
+
+
+def make_main_layout(items: List) -> List:
+    headers, row_data = make_headers_and_rows(items)
+
+    layout_top = [[sg.Text(str(len(items)) + ' Items')],
+                  [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')],
+                  [sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
+    # layout = layout_top + rows
+    layout_table = [[sg.Table(values=row_data, headings=headers, max_col_width=25,
+                              # background_color='light blue',
+                              auto_size_columns=True,
+                              display_row_numbers=True,
+                              justification='left',
+                              num_rows=20,
+                              # alternating_row_color='lightyellow',
+                              key='-TABLE-',
+                              row_height=35,
+                              tooltip='This is a table')]]
+    layout = layout_top + layout_table
+    return layout
+
+
 def main_window():
     """
 
@@ -41,27 +69,7 @@ def main_window():
     logging.info('Starting GUI')
 
     items = db.get_current_items()
-    headers = ['Title', 'Author', 'Price', 'New & Used', 'Rating', 'Reviews', 'Updated']
-    row_data = [[wrap_text(it['name']), it['by_line'], it['price_amazon'], it['price_used_new'], str(it['rating']),
-                 str(it['num_reviews']), it['update_date']] for it in items]
-
-    # rows = make_rows(items)
-
-    layout_top = [[sg.Text(str(len(items)) + ' Items')],
-              [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')],
-                  [sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
-    # layout = layout_top + rows
-    layout_table = [[sg.Table(values=row_data, headings=headers, max_col_width=25,
-                    # background_color='light blue',
-                    auto_size_columns=True,
-                    display_row_numbers=True,
-                    justification='left',
-                    num_rows=20,
-                    # alternating_row_color='lightyellow',
-                    key='-TABLE-',
-                    row_height=35,
-                    tooltip='This is a table')]]
-    layout = layout_top + layout_table
+    layout = make_main_layout(items)
 
     window = sg.Window('Main Window', resizable=True).Layout([[sg.Column(layout, size=(900, 600), scrollable=True)]])
 
@@ -72,11 +80,7 @@ def main_window():
         if event == 'Pull Lists':
             listutils.download_all_lists()
             items = db.get_current_items()
-            rows = make_rows(items)
-            layout_top = [[sg.Text('Text')],
-                          [sg.Text('Input Text: ')], [sg.InputText()],
-                          [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')]]
-            layout = layout_top + rows
+            layout = make_main_layout(items)
             window1 = sg.Window('Main Window', resizable=True).Layout(
                 [[sg.Column(layout, size=(900, 600), scrollable=True)]])
             window.Close()
@@ -102,12 +106,7 @@ def main_window():
         if event == 'Sort Author':
             items = sorted(items, key=lambda x: x['by_line'], reverse=sort_author_direction)
             sort_author_direction = not sort_author_direction
-            rows = make_rows(items)
-            layout_top = [[sg.Text('Text')],
-                          [sg.Text('Input Text: ')], [sg.InputText()],
-                          [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')],
-                  [sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
-            layout = layout_top + rows
+            layout = make_main_layout(items)
             window1 = sg.Window('Main Window', resizable=True).Layout(
                 [[sg.Column(layout, size=(900, 600), scrollable=True)]])
             window.Close()
