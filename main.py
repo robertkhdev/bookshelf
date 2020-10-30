@@ -43,15 +43,16 @@ def make_main_layout(items: List) -> List:
     headers, row_data = make_headers_and_rows(items)
 
     layout_top = [[sg.Text(str(len(items)) + ' Items')],
-                  [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists')],
-                  [sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
+                  [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists'),
+                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
     # layout = layout_top + rows
-    layout_table = [[sg.Table(values=row_data, headings=headers, max_col_width=25,
+    layout_table = [[sg.Table(values=row_data, headings=headers, max_col_width=30,
                               # background_color='light blue',
+                              enable_events=True,
                               auto_size_columns=True,
                               display_row_numbers=True,
                               justification='left',
-                              num_rows=20,
+                              num_rows=15,
                               # alternating_row_color='lightyellow',
                               key='-TABLE-',
                               row_height=35,
@@ -73,7 +74,7 @@ def main_window():
     items = db.get_current_items()
     layout = make_main_layout(items)
 
-    window = sg.Window('Main Window', resizable=True).Layout([[sg.Column(layout, size=(900, 600), scrollable=True)]])
+    window = sg.Window('Main Window', resizable=True).Layout([[sg.Column(layout, size=(1100, 700), scrollable=True)]])
 
     while True:
         event, values = window.read()
@@ -117,6 +118,10 @@ def main_window():
             sort_rating_direction = not sort_rating_direction
             headers, row_data = make_headers_and_rows(items)
             window['-TABLE-'].update(row_data)
+        if event == '-TABLE-':
+            # window['-TABLE-']
+            print(values)
+            
 
     window.close()
 
