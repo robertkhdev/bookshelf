@@ -11,7 +11,7 @@ from sqlite3 import Error
 from typing import Any, Dict, List, Tuple
 
 DB_COLUMNS_LIST = ('name', 'by_line', 'price_amazon', 'price_used_new', 'rating', 'num_reviews', 'item_id',
-                   'item_external_id', 'update_date')
+                   'item_external_id', 'update_date', 'list_name')
 
 db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
@@ -62,7 +62,8 @@ def create_items_table(conn):
                                             num_reviews int,
                                             item_id text,
                                             item_external_id text,
-                                            update_date datetime
+                                            update_date datetime,
+                                            list_name text
                                         ); """
 
     if conn is not None:
@@ -80,10 +81,10 @@ def load_data(data):
     sql_statement = """INSERT INTO 
                             items
                             (name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
-                            item_external_id, update_date)
+                            item_external_id, update_date, list_name)
                         VALUES
                             (:name, :by_line, :price_amazon, :price_used_new, :rating, :num_reviews, :item_id,
-                            :item_external_id, :update_date)"""
+                            :item_external_id, :update_date, :list_name)"""
     conn = create_connection(db_path)
     with conn:
         create_items_table(conn)

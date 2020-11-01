@@ -11,7 +11,7 @@ from typing import Any, Dict, List
 
 def save_list_to_file(items: Any, name: str = None) -> None:
     print('Saving list: ', name)
-    save_items = amazon.build_items_list(items)
+    save_items = amazon.build_items_list(items, name)
     list_dir_path = pathlib.Path.home().joinpath('bookshelf', 'lists')
     if not list_dir_path.exists():
         list_dir_path.mkdir()
@@ -27,7 +27,7 @@ def save_list_to_file(items: Any, name: str = None) -> None:
 
 def save_list(items: Any, name: str = None) -> None:
     print('Saving list to database: ', name)
-    save_items = amazon.build_items_list(items)
+    save_items = amazon.build_items_list(items, name)
     db.load_data(save_items)
 
 

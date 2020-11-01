@@ -33,9 +33,9 @@ def wrap_text(text: str, n=60) -> str:
 
 
 def make_headers_and_rows(items: List) -> (List, List):
-    headers = ['Title', 'Author', 'Price', 'New & Used', 'Rating', 'Reviews', 'Updated']
+    headers = ['Title', 'Author', 'Price', 'New & Used', 'Rating', 'Reviews', 'List', 'Updated']
     row_data = [[wrap_text(it['name']), it['by_line'], it['price_amazon'], it['price_used_new'], str(it['rating']),
-                 str(it['num_reviews']), it['update_date']] for it in items]
+                 str(it['num_reviews']), it['list_name'], it['update_date']] for it in items]
     return headers, row_data
 
 
@@ -121,7 +121,7 @@ def main_window():
         if event == '-TABLE-':
             # window['-TABLE-']
             print(values)
-            
+
 
     window.close()
 

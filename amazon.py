@@ -174,7 +174,7 @@ def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chro
     return items
 
 
-def build_items_list(items: Any) -> List[Dict[str, str]]:
+def build_items_list(items: Any, list_name: str = '') -> List[Dict[str, str]]:
     names = [parse_item_name(i) for i in items]
     by_lines = [parse_item_byline(i) for i in items]
     prices_amazon = [parse_item_amazon_price(i) for i in items]
@@ -193,7 +193,8 @@ def build_items_list(items: Any) -> List[Dict[str, str]]:
                   'num_reviews': i[5],
                   'item_id': i[6],
                   'item_external_id': i[7],
-                  'update_date': update_time} for i in combos]
+                  'update_date': update_time,
+                  'list_name': list_name} for i in combos]
     return list_dict
 
 
