@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Tuple
 
 DB_COLUMNS_LIST = ('name', 'by_line', 'price_amazon', 'price_used_new', 'rating', 'num_reviews', 'item_id',
                    'item_external_id', 'update_date', 'list_name')
+RETURN_COLUMNS_LIST = ('item_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews',
+                       'name', 'by_line', 'item_external_id', 'list_name')
 
 db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
@@ -151,7 +153,7 @@ def convert_db_row(row: Tuple) -> Dict:
     :param row: tuple of single result row from database
     :return: dict of item details, column names as keys
     """
-    return dict(zip(DB_COLUMNS_LIST, row))
+    return dict(zip(RETURN_COLUMNS_LIST, row))
 
 
 def get_current_items() -> List:
@@ -159,8 +161,7 @@ def get_current_items() -> List:
     Gets the unique items with the latest update_date from the database.
     :return:
     """
-    sql_statment = """SELECT DISTINCT items.item_id, update_date, price_amazon, price_used_new, rating, num_reviews,
-                                name, by_line text, item_external_id, list_name
+    sql_statement = """SELECT DISTINCT items.""" + ', '.join(RETURN_COLUMNS_LIST) + """ 
                         FROM items LEFT JOIN
                         (SELECT 
                         item_id, update_date, price_amazon, price_used_new, rating, num_reviews
@@ -173,7 +174,7 @@ def get_current_items() -> List:
     try:
         conn = create_connection(db_path)
         c = conn.cursor()
-        c.execute(sql_statment)
+        c.execute(sql_statement)
         rows = c.fetchall()
         items = [convert_db_row(r) for r in rows]
     except Error as e:
