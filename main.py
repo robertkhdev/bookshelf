@@ -12,10 +12,10 @@ def make_detail_line(item: Any) -> str:
     return text
 
 
-def make_rows(items: List) -> List:
-    double_rows = [make_item_row(item, i+1) for i, item in enumerate(items)]
-    rows = [[item] for subrow in double_rows for item in subrow]
-    return rows
+# def make_rows(items: List) -> List:
+#     double_rows = [make_item_row(item, i+1) for i, item in enumerate(items)]
+#     rows = [[item] for subrow in double_rows for item in subrow]
+#     return rows
 
 
 def make_item_row(item: Any, num: int = 0) -> List:
@@ -45,6 +45,9 @@ def make_main_layout(items: List) -> List:
     layout_top = [[sg.Text(str(len(items)) + ' Items')],
                   [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists'),
                   sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
+    if len(items) == 0:
+        row_data = [['', '', '', '', '', '', '', '']]
+
     # layout = layout_top + rows
     layout_table = [[sg.Table(values=row_data, headings=headers, max_col_width=30,
                               # background_color='light blue',

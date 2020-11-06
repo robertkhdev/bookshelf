@@ -76,7 +76,7 @@ def download_all_lists():
         try:
             save_list(amazon.get_amazon_list(url['url']), url['name'])
         except Exception as e:
-            print(e)
+            print(e, ' in download_all_lists')
 
 
 def load_list(file_name: str) -> List[Dict[str, str]]:

@@ -27,7 +27,7 @@ def create_connection(db_file: str) -> Any:
         conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
-        print(e)
+        print(e, ' in create_connection')
 
     return conn
 
@@ -43,7 +43,7 @@ def create_table(conn, create_table_sql):
         c.execute(create_table_sql)
         conn.commit()
     except Error as e:
-        print(e)
+        print(e, ' in create_table')
 
 
 def create_items_table(conn):
@@ -66,8 +66,39 @@ def create_items_table(conn):
                                             list_name text
                                         ); """
 
+    sql_create_items_table = """ CREATE TABLE IF NOT EXISTS items (
+                                                id integer PRIMARY KEY,
+                                                name text NOT NULL,
+                                                by_line text,
+                                                item_id text,
+                                                item_external_id text,
+                                                list_name text
+                                            ); """
+
     if conn is not None:
         create_table(conn, sql_create_items_table)
+    else:
+        print("Error! Cannot create database connection.")
+
+
+def create_records_table(conn):
+    """
+
+    :param conn:
+    :return:
+    """
+    sql_create_records_table = """ CREATE TABLE IF NOT EXISTS records (
+                                            id integer PRIMARY KEY,
+                                            item_id text,
+                                            update_date datetime,
+                                            price_amazon text,
+                                            price_used_new text,
+                                            rating double,
+                                            num_reviews int
+                                        ); """
+
+    if conn is not None:
+        create_table(conn, sql_create_records_table)
     else:
         print("Error! Cannot create database connection.")
 
@@ -78,6 +109,9 @@ def load_data(data):
     :param data: list of dictionaries containing item data
     :return:
     """
+
+    item_columns = ['name', 'by_line', 'item_id', 'item_external_id', 'list_name']
+    record_columns = ['item_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews']
     sql_statement = """INSERT INTO 
                             items
                             (name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
@@ -85,15 +119,30 @@ def load_data(data):
                         VALUES
                             (:name, :by_line, :price_amazon, :price_used_new, :rating, :num_reviews, :item_id,
                             :item_external_id, :update_date, :list_name)"""
+
+    item_data = [{k: v for k, v in d.items() if k in item_columns} for d in data]
+    record_data = [{k: v for k, v in d.items() if k in record_columns} for d in data]
+
+    sql_items = """INSERT INTO items
+                        (""" + ','.join(item_columns) + """)
+                        VALUES
+                        (:""" + ', :'.join(item_columns) + """)"""
+    sql_records = """INSERT INTO records
+                            (""" + ','.join(record_columns) + """)
+                            VALUES
+                            (:""" + ', :'.join(record_columns) + """)"""
     conn = create_connection(db_path)
     with conn:
         create_items_table(conn)
+        create_records_table(conn)
         try:
             c = conn.cursor()
-            c.executemany(sql_statement, data)
+            # c.executemany(sql_statement, data)
+            c.executemany(sql_items, item_data)
+            c.executemany(sql_records, record_data)
             conn.commit()
         except Error as e:
-            print(e)
+            print(e, ' in load_data')
 
 
 def convert_db_row(row: Tuple) -> Dict:
@@ -110,10 +159,16 @@ def get_current_items() -> List:
     Gets the unique items with the latest update_date from the database.
     :return:
     """
-    sql_statment = """SELECT """ + ','.join(DB_COLUMNS_LIST) + """
-                        FROM items it1
+    sql_statment = """SELECT DISTINCT items.item_id, update_date, price_amazon, price_used_new, rating, num_reviews,
+                                name, by_line text, item_external_id, list_name
+                        FROM items LEFT JOIN
+                        (SELECT 
+                        item_id, update_date, price_amazon, price_used_new, rating, num_reviews
+                        FROM records r1
                         WHERE
-                            it1.update_date = (SELECT max(update_date) FROM items it2 WHERE it1.item_id = it2.item_id)"""
+                            r1.update_date = (SELECT max(update_date) FROM records r2 WHERE r1.item_id = r2.item_id)) rs
+                        ON items.item_id=rs.item_id
+                            """
     items = []
     try:
         conn = create_connection(db_path)
@@ -122,7 +177,7 @@ def get_current_items() -> List:
         rows = c.fetchall()
         items = [convert_db_row(r) for r in rows]
     except Error as e:
-        print(e)
+        print(e, ' in get_current_items')
     return items
 
 
