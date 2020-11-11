@@ -55,26 +55,13 @@ def create_items_table(conn):
     :return:
     """
     sql_create_items_table = """ CREATE TABLE IF NOT EXISTS items (
-                                            id integer PRIMARY KEY,
-                                            name text NOT NULL,
-                                            by_line text,
-                                            price_amazon text,
-                                            price_used_new text,
-                                            rating double,
-                                            num_reviews int,
-                                            item_id text,
-                                            item_external_id text,
-                                            update_date datetime,
-                                            list_name text
-                                        ); """
-
-    sql_create_items_table = """ CREATE TABLE IF NOT EXISTS items (
                                                 id integer PRIMARY KEY,
                                                 name text NOT NULL,
                                                 by_line text,
                                                 item_id text,
                                                 item_external_id text,
-                                                list_name text
+                                                list_name text,
+                                                visible int
                                             ); """
 
     if conn is not None:
@@ -105,10 +92,11 @@ def create_records_table(conn):
         print("Error! Cannot create database connection.")
 
 
-def load_data(data):
+def load_data(data, default_visible=1):
     """
     Load new data to items table.
     :param data: list of dictionaries containing item data
+    :param default_visible: what to default the visible column to in items table
     :return:
     """
 
@@ -132,7 +120,7 @@ def load_data(data):
     sql_records = """INSERT INTO records
                             (""" + ','.join(record_columns) + """)
                             VALUES
-                            (:""" + ', :'.join(record_columns) + """)"""
+                            (:""" + ', :'.join(record_columns) + ', ' + default_visible + """)"""
     conn = create_connection(db_path)
     with conn:
         create_items_table(conn)
@@ -170,6 +158,8 @@ def get_current_items() -> List:
                             r1.update_date = (SELECT max(update_date) FROM 
                                 records r2 WHERE r1.item_external_id = r2.item_external_id)) rs
                         ON items.item_external_id=rs.item_external_id
+                        WHERE 
+                            items.visible = 1
                             """
     items = []
     try:
@@ -181,6 +171,26 @@ def get_current_items() -> List:
     except Error as e:
         print(e, ' in get_current_items')
     return items
+
+
+def set_visibility(item_external_id: str, visibility: int):
+    """
+
+    :param item_external_id:
+    :param visibility:
+    :return:
+    """
+    sql_statement = """UPDATE items
+                        SET visible = """ + visibility + """
+                        WHERE item_external_id = """ + item_external_id
+    if visibility is not int:
+        raise ValueError()
+    try:
+        conn = create_connection(db_path)
+        c = conn.cursor()
+        c.execute(sql_statement)
+    except Error as e:
+        print(e, ' in set_visibility')
 
 
 if __name__ == '__main__':
