@@ -12,8 +12,8 @@ from typing import Any, Dict, List, Tuple
 
 DB_COLUMNS_LIST = ('name', 'by_line', 'price_amazon', 'price_used_new', 'rating', 'num_reviews', 'item_id',
                    'item_external_id', 'update_date', 'list_name')
-RETURN_COLUMNS_LIST = ('item_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews',
-                       'name', 'by_line', 'item_external_id', 'list_name')
+RETURN_COLUMNS_LIST = ('item_external_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews',
+                       'name', 'by_line', 'item_id', 'list_name')
 
 db_path = pathlib.Path.home().joinpath('bookshelf', 'database.db')
 
@@ -91,7 +91,7 @@ def create_records_table(conn):
     """
     sql_create_records_table = """ CREATE TABLE IF NOT EXISTS records (
                                             id integer PRIMARY KEY,
-                                            item_id text,
+                                            item_external_id text,
                                             update_date datetime,
                                             price_amazon text,
                                             price_used_new text,
@@ -113,7 +113,7 @@ def load_data(data):
     """
 
     item_columns = ['name', 'by_line', 'item_id', 'item_external_id', 'list_name']
-    record_columns = ['item_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews']
+    record_columns = ['item_external_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews']
     sql_statement = """INSERT INTO 
                             items
                             (name, by_line, price_amazon, price_used_new, rating, num_reviews, item_id,
@@ -164,11 +164,12 @@ def get_current_items() -> List:
     sql_statement = """SELECT DISTINCT items.""" + ', '.join(RETURN_COLUMNS_LIST) + """ 
                         FROM items LEFT JOIN
                         (SELECT 
-                        item_id, update_date, price_amazon, price_used_new, rating, num_reviews
+                        item_external_id, update_date, price_amazon, price_used_new, rating, num_reviews
                         FROM records r1
                         WHERE
-                            r1.update_date = (SELECT max(update_date) FROM records r2 WHERE r1.item_id = r2.item_id)) rs
-                        ON items.item_id=rs.item_id
+                            r1.update_date = (SELECT max(update_date) FROM 
+                                records r2 WHERE r1.item_external_id = r2.item_external_id)) rs
+                        ON items.item_external_id=rs.item_external_id
                             """
     items = []
     try:
