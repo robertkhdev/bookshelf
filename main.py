@@ -42,9 +42,10 @@ def make_headers_and_rows(items: List) -> (List, List):
 def make_main_layout(items: List) -> List:
     headers, row_data = make_headers_and_rows(items)
 
-    layout_top = [[sg.Text(str(len(items)) + ' Items')],
-                  [sg.Button("Pull Lists"), sg.Button('Add List'), sg.Button('View Lists'),
-                   sg.Button("Sort Title"),
+    menu_def = [['Lists', ['Pull Lists', 'Add List', 'View Lists']]]
+
+    layout_top = [[sg.Menu(menu_def)], [sg.Text(str(len(items)) + ' Items')],
+                  [sg.Button("Sort Title"),
                   sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
     if len(items) == 0:
         row_data = [['', '', '', '', '', '', '', '', '', '']]
@@ -128,9 +129,6 @@ def main_window():
             sort_rating_direction = not sort_rating_direction
             headers, row_data = make_headers_and_rows(items)
             window['-TABLE-'].update(row_data)
-        if event == '-TABLE-':
-            # window['-TABLE-']
-            print(values)
 
 
     window.close()
