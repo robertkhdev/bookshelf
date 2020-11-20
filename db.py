@@ -8,6 +8,7 @@ import listutils
 import pathlib
 import sqlite3
 from sqlite3 import Error
+import traceback
 from typing import Any, Dict, List, Tuple
 
 DB_COLUMNS_LIST = ('name', 'by_line', 'price_amazon', 'price_used_new', 'rating', 'num_reviews', 'item_id',
@@ -100,7 +101,7 @@ def load_data(data, default_visible=1):
     :return:
     """
 
-    item_columns = ['name', 'by_line', 'item_id', 'item_external_id', 'list_name']
+    item_columns = ['name', 'by_line', 'item_id', 'item_external_id', 'list_name', 'visible']
     record_columns = ['item_external_id', 'update_date', 'price_amazon', 'price_used_new', 'rating', 'num_reviews']
     sql_statement = """INSERT INTO 
                             items
@@ -111,6 +112,8 @@ def load_data(data, default_visible=1):
                             :item_external_id, :update_date, :list_name)"""
 
     item_data = [{k: v for k, v in d.items() if k in item_columns} for d in data]
+    for it in item_data:
+        it['visible'] = str(default_visible)
     record_data = [{k: v for k, v in d.items() if k in record_columns} for d in data]
 
     sql_items = """INSERT INTO items
@@ -120,7 +123,7 @@ def load_data(data, default_visible=1):
     sql_records = """INSERT INTO records
                             (""" + ','.join(record_columns) + """)
                             VALUES
-                            (:""" + ', :'.join(record_columns) + ', ' + default_visible + """)"""
+                            (:""" + ', :'.join(record_columns) + """)"""
     conn = create_connection(db_path)
     with conn:
         create_items_table(conn)
@@ -133,6 +136,7 @@ def load_data(data, default_visible=1):
             conn.commit()
         except Error as e:
             print(e, ' in load_data')
+            traceback.print_exc()
 
 
 def convert_db_row(row: Tuple) -> Dict:
