@@ -102,7 +102,8 @@ def main_window():
             ]
             window_popup = sg.Window('Add List', layout_popup)
             event, values = window_popup.read()
-            listutils.add_list_to_file(values[0], values[1])
+            if event == 'Submit':
+                listutils.add_list_to_file(values[0], values[1])
             window_popup.Close()
         if event == 'View Lists':
             lists = listutils.get_lists_from_file('list_urls.json')
