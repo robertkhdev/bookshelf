@@ -75,7 +75,7 @@ def download_all_lists():
     for url in list_urls:
         print('Downloading list: ', url['name'])
         try:
-            save_list(amazon.get_amazon_list(url['url']), url['name'])
+            save_list(amazon.get_amazon_list(url['url'], name=url['name']), url['name'])
         except Exception as e:
             print(e, ' in download_all_lists')
             traceback.print_exc()
