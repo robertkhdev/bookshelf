@@ -59,7 +59,11 @@ def parse_item_byline(item: Any) -> str:
     :param item: bs4.element.Tag
     :return: string
     """
-    return item.find_all('span', class_="a-size-base", id=re.compile('^item-byline-(.*)'))[0].contents[0]
+    try:
+        value = item.find_all('span', class_="a-size-base", id=re.compile('^item-byline-(.*)'))[0].contents[0]
+    except IndexError:
+        value = 'N/A'
+    return value
 
 
 def parse_item_amazon_price(item: Any) -> str:
@@ -138,7 +142,7 @@ def parse_item_external_id(item: Any) -> str:
     return item_external_id
 
 
-def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
+def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
     """
     Use Selenium webdriver for Chrome in headless mode to retrieve the page for an Amazon Wish List.
     The list expands dynamically as the use scrolls down the page if the list is long enough to go past one page.
@@ -168,6 +172,10 @@ def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chro
     time.sleep(5)
     html_source: str = browser.page_source
     # TODO: separate code that parses html string with bs4
+    # dump raw html to file for debug
+    path = pathlib.Path.home().joinpath('bookshelf', 'debug', name + '.html')
+    with path.open(mode='w', encoding="utf-8") as f:
+        f.write(html_source)
     soup = BeautifulSoup(html_source, 'html.parser')
     items = soup.find_all('div', class_='a-fixed-left-grid-inner', style='padding-left:220px')
     browser.quit()
@@ -175,6 +183,7 @@ def get_amazon_list(url: str, webdriver_path: str = 'C:/Users/rober/Desktop/chro
 
 
 def build_items_list(items: Any, list_name: str = '') -> List[Dict[str, str]]:
+    print('Extracting ' + str(len(items)) + ' items')
     names = [parse_item_name(i) for i in items]
     by_lines = [parse_item_byline(i) for i in items]
     prices_amazon = [parse_item_amazon_price(i) for i in items]
