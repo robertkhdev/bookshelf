@@ -6,6 +6,7 @@ import amazon
 import db
 import json
 import pathlib
+import traceback
 from typing import Any, Dict, List
 
 
@@ -77,6 +78,7 @@ def download_all_lists():
             save_list(amazon.get_amazon_list(url['url']), url['name'])
         except Exception as e:
             print(e, ' in download_all_lists')
+            traceback.print_exc()
 
 
 def load_list(file_name: str) -> List[Dict[str, str]]:
