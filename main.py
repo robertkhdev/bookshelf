@@ -1,3 +1,4 @@
+import analyze
 import PySimpleGUI as sg
 import db
 import listutils
@@ -46,7 +47,7 @@ def make_main_layout(items: List) -> List:
 
     layout_top = [[sg.Menu(menu_def)], [sg.Text(str(len(items)) + ' Items')],
                   [sg.Button("Sort Title"),
-                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
+                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating"), sg.Button('Histogram')]]
     if len(items) == 0:
         row_data = [['', '', '', '', '', '', '', '', '', '']]
 
@@ -129,6 +130,9 @@ def main_window():
             sort_rating_direction = not sort_rating_direction
             headers, row_data = make_headers_and_rows(items)
             window['-TABLE-'].update(row_data)
+        if event == 'Histogram':
+            prices = [d['price_amazon'] for d in items]
+            analyze.plot_price_histogram(prices)
 
 
     window.close()
