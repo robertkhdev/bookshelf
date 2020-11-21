@@ -10,6 +10,8 @@ from seleniumwire import webdriver
 import time
 from typing import Any, Dict, List, Optional
 
+***REMOVED***
+
 
 class Error(Exception):
     """Base class for exceptions in this module"""
@@ -89,7 +91,7 @@ def parse_item_used_new_price(item: Any) -> str:
     price_used_new = r'N/A'
     try:
         price_used_new = item.find_all('span', class_="a-color-price itemUsedAndNewPrice")[0].contents[0]
-    except:
+    except IndexError:
         pass
     return price_used_new
 
@@ -104,7 +106,7 @@ def parse_rating(item: Any) -> str:
     try:
         stars_str = item.find_all('span', class_="a-icon-alt")[0].contents[0]
         rating = (float(stars_str.split()[0]), float(stars_str.split()[3]))
-    except:
+    except IndexError:
         pass
     return rating
 
@@ -118,7 +120,7 @@ def parse_num_reviews(item: Any) -> str:
     num_reviews_str = '0'
     try:
         num_reviews_str = item.find_all('a', class_="a-size-base a-link-normal")[0].contents[0].strip()
-    except:
+    except IndexError:
         pass
     return num_reviews_str
 
@@ -127,7 +129,7 @@ def parse_item_id(item: Any) -> str:
     item_id = ''
     try:
         item_id = item.find_all('input', attrs={'name':"itemId"})[0]['value']
-    except:
+    except IndexError:
         pass
     return item_id
 
@@ -136,7 +138,7 @@ def parse_item_external_id(item: Any) -> str:
     item_external_id = ''
     try:
         item_external_id = item.find_all('input', attrs={'name':"itemExternalId"})[0]['value']
-    except:
+    except IndexError:
         pass
     return item_external_id
 
@@ -151,7 +153,7 @@ def parse_html(html_source: str, name: str) -> Any:
     return items
 
 
-def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
+def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = WEBDRIVER_PATH) -> Any:
     """
     Use Selenium webdriver for Chrome in headless mode to retrieve the page for an Amazon Wish List.
     The list expands dynamically as the use scrolls down the page if the list is long enough to go past one page.
