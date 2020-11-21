@@ -34,20 +34,23 @@ def wrap_text(text: str, n=60) -> str:
 
 
 def make_headers_and_rows(items: List) -> (List, List):
-    headers = ['Title', 'Author', 'Price', 'New & Used', 'Rating', 'Reviews', 'List', 'Updated', 'Item ID', 'Ext. Item ID']
+    headers = ['Title', 'Author', 'Price', 'New & Used', 'Rating', 'Reviews', 'List', 'Updated', 'Item ID',
+               'Ext. Item ID']
     row_data = [[wrap_text(it['name']), it['by_line'], it['price_amazon'], it['price_used_new'], str(it['rating']),
-                 str(it['num_reviews']), it['list_name'], it['update_date'], it['item_id'], it['item_external_id']] for it in items]
+                 str(it['num_reviews']), it['list_name'], it['update_date'], it['item_id'], it['item_external_id']]
+                for it in items]
     return headers, row_data
 
 
 def make_main_layout(items: List) -> List:
     headers, row_data = make_headers_and_rows(items)
 
-    menu_def = [['Lists', ['Pull Lists', 'Add List', 'View Lists']]]
+    menu_def = [['Lists', ['Pull Lists', 'Add List', 'View Lists']],
+                ['Charts', ['Histogram - Amazon Price', 'Ratings vs Reviews']]]
 
     layout_top = [[sg.Menu(menu_def)], [sg.Text(str(len(items)) + ' Items')],
                   [sg.Button("Sort Title"),
-                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating"), sg.Button('Histogram')]]
+                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
     if len(items) == 0:
         row_data = [['', '', '', '', '', '', '', '', '', '']]
 
@@ -131,9 +134,12 @@ def main_window():
             sort_rating_direction = not sort_rating_direction
             headers, row_data = make_headers_and_rows(items)
             window['-TABLE-'].update(row_data)
-        if event == 'Histogram':
+        if event == 'Histogram - Amazon Price':
             prices = [d['price_amazon'] for d in items]
             analyze.plot_price_histogram(prices)
+        if event == 'Ratings vs Reviews':
+            ratings_reviews = [[d['rating'], d['num_reviews']] for d in items]
+            analyze.plot_ratings_reviews(ratings_reviews)
 
 
     window.close()

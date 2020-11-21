@@ -16,3 +16,20 @@ def plot_price_histogram(raw_data: List[str]):
     data = [convert_price_string(x) for x in raw_data if convert_price_string(x) is not None]
     plt.hist(data)
     plt.show(block=False)
+
+
+def plot_ratings_reviews(raw_data: List[List]):
+
+    def clean_row(row):
+        try:
+            if isinstance(row[1], str):
+                row[1] = int(row[1].replace(',', ''))
+            row[0] = float(row[0])
+            return row
+        except ValueError:
+            return None
+
+    data = [clean_row(d) for d in raw_data if clean_row(d) is not None]
+    data = list(zip(*data))
+    plt.scatter(data[0], data[1])
+    plt.show(block=False)
