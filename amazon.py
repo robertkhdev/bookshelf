@@ -8,7 +8,7 @@ import pathlib
 import re
 from seleniumwire import webdriver
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class Error(Exception):
@@ -40,10 +40,9 @@ def construct_headers() -> Dict[str, str]:
     return headers
 
 
-def parse_item_name(item: Any) -> str:
+def parse_item_name(item: Any) -> Optional[str]:
     """
     Extract name (e.g. book title) from html soup.
-    TODO: return type should be EITHER str or None
     :param item: bs4.element.Tag
     :return: string
     """
@@ -142,6 +141,16 @@ def parse_item_external_id(item: Any) -> str:
     return item_external_id
 
 
+def parse_html(html_source: str, name: str) -> Any:
+    # dump raw html to file for debug
+    path = pathlib.Path.home().joinpath('bookshelf', 'debug', name + '.html')
+    with path.open(mode='w', encoding="utf-8") as f:
+        f.write(html_source)
+    soup = BeautifulSoup(html_source, 'html.parser')
+    items = soup.find_all('div', class_='a-fixed-left-grid-inner', style='padding-left:220px')
+    return items
+
+
 def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = 'C:/Users/rober/Desktop/chromedriver.exe') -> Any:
     """
     Use Selenium webdriver for Chrome in headless mode to retrieve the page for an Amazon Wish List.
@@ -150,6 +159,7 @@ def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = 'C:/U
     seconds to allow time for the rest of the content to load. Then the html of the page, which now includes the
     entire list is fetched from the webdriver.
     :param url: url of Amazon wish list
+    :param name: the name of the Amazon list
     :param webdriver_path: path to the websdriver executable
     :return: bs4.element.ResultSet
     """
@@ -171,14 +181,8 @@ def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = 'C:/U
 
     time.sleep(5)
     html_source: str = browser.page_source
-    # TODO: separate code that parses html string with bs4
-    # dump raw html to file for debug
-    path = pathlib.Path.home().joinpath('bookshelf', 'debug', name + '.html')
-    with path.open(mode='w', encoding="utf-8") as f:
-        f.write(html_source)
-    soup = BeautifulSoup(html_source, 'html.parser')
-    items = soup.find_all('div', class_='a-fixed-left-grid-inner', style='padding-left:220px')
     browser.quit()
+    items = parse_html(html_source, name)
     return items
 
 
