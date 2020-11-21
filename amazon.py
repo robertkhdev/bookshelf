@@ -128,7 +128,7 @@ def parse_num_reviews(item: Any) -> str:
 def parse_item_id(item: Any) -> str:
     item_id = ''
     try:
-        item_id = item.find_all('input', attrs={'name':"itemId"})[0]['value']
+        item_id = item.find_all('input', attrs={'name': "itemId"})[0]['value']
     except IndexError:
         pass
     return item_id
@@ -137,7 +137,7 @@ def parse_item_id(item: Any) -> str:
 def parse_item_external_id(item: Any) -> str:
     item_external_id = ''
     try:
-        item_external_id = item.find_all('input', attrs={'name':"itemExternalId"})[0]['value']
+        item_external_id = item.find_all('input', attrs={'name': "itemExternalId"})[0]['value']
     except IndexError:
         pass
     return item_external_id
