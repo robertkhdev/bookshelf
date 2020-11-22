@@ -50,7 +50,8 @@ def make_main_layout(items: List) -> List:
 
     layout_top = [[sg.Menu(menu_def)], [sg.Text(str(len(items)) + ' Items')],
                   [sg.Button("Sort Title"),
-                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating")]]
+                  sg.Button("Sort Author"), sg.Button("Sort Amazon Price"), sg.Button("Sort Rating"),
+                   sg.Button('Sort Num Reviews')]]
     if len(items) == 0:
         row_data = [['', '', '', '', '', '', '', '', '', '']]
 
@@ -79,6 +80,7 @@ def main_window():
     sort_author_direction = True
     sort_amazon_price_direction = True
     sort_rating_direction = True
+    sort_reviews_direction = True
     logging.info('Starting GUI')
 
     items = db.get_current_items()
@@ -132,6 +134,11 @@ def main_window():
         if event == 'Sort Rating':
             items = sorted(items, key=lambda x: str(x['rating']), reverse=sort_rating_direction)
             sort_rating_direction = not sort_rating_direction
+            headers, row_data = make_headers_and_rows(items)
+            window['-TABLE-'].update(row_data)
+        if event == 'Sort Num Reviews':
+            items = sorted(items, key=lambda x: analyze.ensure_int(x['num_reviews']), reverse=sort_reviews_direction)
+            sort_reviews_direction = not sort_reviews_direction
             headers, row_data = make_headers_and_rows(items)
             window['-TABLE-'].update(row_data)
         if event == 'Histogram - Amazon Price':
