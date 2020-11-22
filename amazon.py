@@ -178,7 +178,7 @@ def get_amazon_list(url: str, name: str = 'no name', webdriver_path: str = WEBDR
             # Action scroll down
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             break
-        except:
+        except Error:
             pass
 
     time.sleep(5)

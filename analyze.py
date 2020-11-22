@@ -1,5 +1,5 @@
 
-from typing import List
+from typing import List, Optional
 import matplotlib.pyplot as plt
 
 
@@ -9,12 +9,12 @@ def ensure_int(num):
     return num
 
 
-def convert_price_string(price_str: str) -> float:
+def convert_price_string(price_str: str) -> Optional[float]:
     price_str = price_str.replace('$', '')
     try:
         price = float(price_str)
         return price
-    except:
+    except ValueError:
         return None
 
 
