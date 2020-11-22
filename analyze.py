@@ -3,6 +3,12 @@ from typing import List
 import matplotlib.pyplot as plt
 
 
+def ensure_int(num):
+    if isinstance(num, str):
+        num = int(num.replace(',', ''))
+    return num
+
+
 def convert_price_string(price_str: str) -> float:
     price_str = price_str.replace('$', '')
     try:
@@ -22,8 +28,7 @@ def plot_ratings_reviews(raw_data: List[List]):
 
     def clean_row(row):
         try:
-            if isinstance(row[1], str):
-                row[1] = int(row[1].replace(',', ''))
+            row[1] = ensure_int(row[1])
             row[0] = float(row[0])
             return row
         except ValueError:
