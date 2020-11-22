@@ -6,29 +6,6 @@ import logging
 from typing import Any, Dict, List
 
 
-# def make_detail_line(item: Any) -> str:
-#     text = 'Price: ' + item['price_amazon'] + '\tUsed&New: ' + item['price_used_new'] + \
-#            '\tAvg. Rating: ' + str(item['rating']) + '/5' + \
-#            '\tReviews: ' + str(item['num_reviews']) + '\tUpdated: ' + item['update_date'] + '\n'
-#     return text
-
-
-# def make_rows(items: List) -> List:
-#     double_rows = [make_item_row(item, i+1) for i, item in enumerate(items)]
-#     rows = [[item] for subrow in double_rows for item in subrow]
-#     return rows
-
-
-# def make_item_row(item: Any, num: int = 0) -> List:
-#     if num:
-#         num_str = str(num)
-#     else:
-#         num_str = ''
-#     row = [sg.Text(num_str + ' ' + item['name'], font=['Arial', 12, 'bold']), sg.Text(item['by_line'] +
-#                                                                                       '\n' + make_detail_line(item))]
-#     return row
-
-
 def wrap_text(text: str, n=60) -> str:
     return '\n'.join(list(text[i: i+n] for i in range(0, len(text), n)))
 
