@@ -10,7 +10,7 @@ from seleniumwire import webdriver
 import time
 from typing import Any, Dict, List, Optional
 
-***REMOVED***
+
 
 
 class Error(Exception):
@@ -24,11 +24,14 @@ class ItemNotFoundError(Error):
         self.message = message
 
 
-def load_cookie() -> str:
+def load_cookie() -> Optional[str]:
     path = pathlib.Path.home().joinpath('bookshelf', 'cookie.txt')
-    with path.open(mode='r') as f:
-        cookie = f.read()
-    return cookie
+    if path.exists():
+        with path.open(mode='r') as f:
+            cookie = f.read()
+        return cookie
+    else:
+        return None
 
 
 def construct_headers() -> Dict[str, str]:
@@ -36,9 +39,10 @@ def construct_headers() -> Dict[str, str]:
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 '
                       '(KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
-        'cookie': cookie,
         'viewType': 'list'
     }
+    if cookie is not None:
+        headers['cookie'] = cookie
     return headers
 
 
