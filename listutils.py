@@ -90,8 +90,4 @@ def load_list(file_name: str) -> List[Dict[str, str]]:
 
 
 if __name__ == '__main__':
-    # test list retrieval
-    
-    items_test = amazon.get_amazon_list(url)
-    print([amazon.parse_item_name(i) for i in items_test])
-    save_list(items_test)
+    pass
