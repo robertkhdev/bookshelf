@@ -10,7 +10,7 @@ from seleniumwire import webdriver
 import time
 from typing import Any, Dict, List, Optional
 
-
+WEBDRIVER_PATH = './chromedriver.exe'
 
 
 class Error(Exception):
